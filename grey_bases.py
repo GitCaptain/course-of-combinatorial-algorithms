@@ -28,19 +28,23 @@ def solve(adjacency_matrix, costs):
     scalar_product = lambda a, b: sum([a[i]*b[i] for i in range(n)])
     area_controlled = lambda vec, mtrx: all([scalar_product(vec, mtrx[i]) >= 1 for i in range(n)])
 
-    best_vector, best_cost = [], sum(map(abs, costs)) + 1
+    best_vectors, best_cost = [], sum(map(abs, costs)) + 1
 
     for v in grey(n):
         cur_cost = scalar_product(v, costs)
-        if area_controlled(v, adjacency_matrix) and best_cost > cur_cost:
-            best_vector = v
-            best_cost = cur_cost
+        if area_controlled(v, adjacency_matrix):
+            if best_cost > cur_cost:
+                best_cost = cur_cost
+                best_vectors.clear()
+            if best_cost == cur_cost:
+                best_vectors.append(v)
 
-    return best_cost, best_vector
+    return best_cost, best_vectors
+
 
 if __name__ == "__main__":
 
-    g = grey(3)
+    g = grey(int(input('Введите размер вектора: ')))
     print(len(g))
     for v in g:
         print(v)
@@ -49,5 +53,7 @@ if __name__ == "__main__":
     if not s[1]:
         print("Контроль всей территоррии невозможен")
     else:
-        print("минимальная стоимость: {0}.\nразмещать базы следует в районах:\n{1}"
-              .format(s[0], [i+1 for i in range(len(s[1])) if s[1][i]]))
+        print("минимальная стоимость:", s[0])
+        print("Возможные варианты размещения баз:")
+        for v in s[1]:
+            print([i + 1 for i in range(len(v)) if v[i]])
