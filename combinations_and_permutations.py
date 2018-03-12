@@ -1,12 +1,14 @@
 
-def comb(n, k):
+
+# github.com/HigerSkill
+def combinations(n, k):
     A = []
     B = [i+1 for i in range(k)]
 
     if n == k:
         return [B]
-    elif n < k:
-        return False
+    elif n < k or not k:
+        return []
 
     p = k
     while p >= 0:
@@ -18,15 +20,15 @@ def comb(n, k):
 
     return A
 
-
-def permut(n):
+# github.com/HigerSkill
+def permutations(n):
     A = []
     B = [i+1 for i in range(n)]
 
     if n == 0:
         return [[0]]
     elif n < 0:
-        return False
+        return []
 
     while True:
         A.append(B.copy())
@@ -48,14 +50,25 @@ def permut(n):
     return A
 
 
+def accommodations(n, k):
+    permuts = permutations(k)  # все возможные перестановки к чисел
+    combs = combinations(n, k)  # все возможные выборки из n по k
+    all_vectors = []
+    for vector in combs:  # для каждой выборки
+        for permut in permuts:  # смотрим все ее перестановки и добавляем к ответу
+            new_vector = [vector[permut[i]-1] for i in range(k)]
+            all_vectors.append(new_vector)
+    return all_vectors
+
+
 def solve_rhomb():
     from math import sqrt
     get_len_sqr = lambda p1, p2: (p1[0]-p2[0])**2+(p1[1]-p2[1])**2  # квадрат расстояния между точками p1, p2
     scalar_product = lambda v1, v2: v1[0]*v2[0] + v1[1]*v2[1]  # скалярное произведение
-    permutations = permut(4)
+    permuts = permutations(4)
 
     def rhomb_square(cur_points):
-        for permut in permutations:
+        for permut in permuts:
             p1, p2, p3, p4 = [cur_points[permut[i]-1] for i in range(4)]
             if p1 == p2 == p3 == p4:
                 # вырожденный ромб - не ромб
@@ -75,8 +88,8 @@ def solve_rhomb():
 
     best_points = []
     best_square = 0
-    combinations = comb(n, 4)  # все возможные комбинации 4х точек из n
-    for c in combinations:  # перебираем текущую комбинацию
+    combs = combinations(n, 4)  # все возможные комбинации 4х точек из n
+    for c in combs:  # перебираем текущую комбинацию
         cur_combination = [points[i-1] for i in c]  # точки текущей комбинации
         cur_square = rhomb_square(cur_combination)  # площадь текущей комбинации точек
         if cur_square > best_square:  # если площадь больше текущей максимальной, то предыдущие ромбы не нужны
@@ -86,9 +99,64 @@ def solve_rhomb():
             best_points.append(cur_combination)
     return best_square, best_points
 
+# github.com/HigerSkill
+def S(P, c, v):
+    n = len(c[0])
+    k = P[1]
+    s = 0
+    for i in range(n):
+        for j in range(n):
+            s += c[i][j] * v[k[i]-1][k[j]-1]
+
+    return s
+
+# github.com/HigerSkill
+def appoint(c, v, a):
+    n = len(a[0])
+    perm = permutations(n)
+
+    found = []
+    variant = []
+
+    p = []
+    for i in range(len(perm)): # Находим все возможные перестановки
+        p.append([[j for j in range(1, n + 1)], perm[i]])
+
+    for i in range(len(perm)): # Ищем допустмые решения
+        ok = 0
+        for j in range(n):
+            search = p[i]
+            l = search[1][j]
+            if a[j][l - 1] == 0:
+                ok += 1
+        if ok == n:
+            found.append(p[i])
+
+    for i in range(len(found)): # Вычисляем суммы затрат перевозки
+        variant.append(S(found[i], c, v))
+
+    ind = variant.index(min(variant)) # Находим оптимальное решение
+
+    return found[ind]
+
 
 if __name__ == '__main__':
-
+    """
+    print(combinations(1, 0))
+    print(accommodations(1, 0))
+    print(combinations(1, 1))
+    print(accommodations(1, 1))
+    print(combinations(0, 1))
+    print(accommodations(0, 1))
+    print(combinations(3, 3))
+    print(accommodations(3, 3))
+    print(combinations(3, 2))
+    print(accommodations(3, 2))
+    print(combinations(2, 3))
+    print(accommodations(2, 3))
+    print(combinations(4, 3))
+    print(accommodations(4, 3))
+    """
     n = int(input("Введите количество точек и сами точки:\n"))
     points = []
 
@@ -104,3 +172,13 @@ if __name__ == '__main__':
             print(points)
     else:
         print("Нет ни одного ромба")
+
+    print("Квадратичная задача о назначениях")
+    n = int(input("Введите количество городов: "))
+    print("введите матрицу цен:")
+    C = [list(map(int, input().split())) for _ in range(n)]
+    print("введите матрицу объемов перевозок:")
+    V = [list(map(int, input().split())) for _ in range(n)]
+    print("введите матрицу запрещенных назначений:")
+    A = [list(map(int, input().split())) for _ in range(n)]
+    print(appoint(C, V, A))
