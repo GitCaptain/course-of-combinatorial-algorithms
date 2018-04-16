@@ -1,10 +1,15 @@
 
 def haffman(p, k, C, L):
-    if k == 2:
-        C[0] = '0'
-        C[1] = '1'
-        L[0] = L[1] = 1
-        return
+    if k <= 2:
+        try:
+            C[0] = '0'
+            L[0] = 1
+            C[1] = '1'
+            L[1] = 1
+        except:
+            pass
+        finally:
+            return
     d = p[-1] + p[-2]
     j = insert(p, k, d)
     haffman(p[:-1], k-1, C, L)
@@ -66,7 +71,7 @@ if __name__ == '__main__':
            "и_для_него_воскресли_вновь_" \
            "и_божество,_и_вдохновенье,_" \
            "и_жизнь,_и_слезы,_и_любовь."
-    #text = input("Введите текст:\n")
+    text = input("Введите текст:\n")
     m = len(text)
     print("длина текста:", m)
     alph = {}
@@ -101,6 +106,6 @@ if __name__ == '__main__':
     for c in text:
         coded_text += optimum_code[p.index(smb_freq[c])]
     newm = len(coded_text)
-    print("Длина закодированного текста: ", newm, ", текст:\n", sep='')
+    print("Длина закодированного текста: ", newm, ", текст:", sep='')
     print(coded_text)
     print("коэффициент сжатия:", (8-l_avg)/8*100, '%')
